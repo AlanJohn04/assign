@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, AlertCircle, Clock, Pause, CheckCircle } from 'lucide-react';
+import { Search, AlertCircle, Clock, Pause, CheckCircle, Flame, User } from 'lucide-react';
 
 export default function TicketList({
   tickets,
@@ -10,16 +10,17 @@ export default function TicketList({
 }) {
   return (
     <div className="ticket-list-pane">
-      <div className="list-header">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h2 style={{ fontSize: '15px', fontWeight: 700 }}>Tickets ({tickets.length})</h2>
+      <div className="list-search-header">
+        <div className="search-title-row">
+          <span className="queue-label-heading">Problems Queue</span>
+          <span className="queue-total-count">{tickets.length}</span>
         </div>
-        <div style={{ position: 'relative' }}>
-          <Search size={14} style={{ position: 'absolute', left: '10px', top: '10px', color: '#94a3b8' }} />
+
+        <div className="search-input-wrapper">
+          <Search size={14} className="search-icon-inside" />
           <input
             type="text"
-            className="search-input"
-            style={{ paddingLeft: '32px' }}
+            className="search-field"
             placeholder="Search tickets, subject, customer..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
@@ -27,10 +28,10 @@ export default function TicketList({
         </div>
       </div>
 
-      <div className="ticket-items-scroll">
+      <div className="ticket-cards-column">
         {tickets.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '32px 16px', color: '#94a3b8', fontSize: '13px' }}>
-            No tickets match your filters
+          <div className="empty-tickets-view">
+            <p>No tickets found matching your filters</p>
           </div>
         ) : (
           tickets.map((t) => {
@@ -41,39 +42,39 @@ export default function TicketList({
             return (
               <div
                 key={t.id}
-                className={`ticket-card ${isSelected ? 'selected' : ''}`}
+                className={`ticket-summary-card ${isSelected ? 'active-ticket' : ''} priority-border-${t.priority}`}
                 onClick={() => onSelectTicket(t.id)}
               >
-                <div className="ticket-card-header">
-                  <span className="ticket-num">{t.ticket_number}</span>
-                  <span className="badge badge-status">
+                <div className="card-top-meta">
+                  <span className="card-ticket-id">{t.ticket_number}</span>
+                  <span className={`status-badge-tag status-${t.status}`}>
                     {t.status.replace(/_/g, ' ')}
                   </span>
                 </div>
 
-                <div className="ticket-title">{t.subject}</div>
+                <div className="card-ticket-subject">{t.subject}</div>
 
-                <div className="ticket-meta">
-                  <span>{t.customer_name}</span>
-                  <span>{t.assignee_name ? `👤 ${t.assignee_name.split(' ')[0]}` : '⚠️ Unassigned'}</span>
+                <div className="card-reporter-assignee">
+                  <span className="reporter-name">{t.customer_name}</span>
+                  <span className={`assignee-name ${t.assigned_to ? 'has-assignee' : 'no-assignee'}`}>
+                    {t.assignee_name ? `👤 ${t.assignee_name.split(' ')[0]}` : '⚠️ Unassigned'}
+                  </span>
                 </div>
 
-                <div className="badges-row">
-                  <span className={`badge badge-${t.priority}`}>
+                <div className="card-tags-row">
+                  <span className={`priority-tag-mini tag-${t.priority}`}>
                     {t.priority.toUpperCase()}
                   </span>
 
                   {isBreached && (
-                    <span className="badge badge-breached">
-                      <AlertCircle size={12} />
-                      SLA LATE
+                    <span className="sla-alert-pill">
+                      <AlertCircle size={11} /> SLA LATE
                     </span>
                   )}
 
                   {isPaused && (
-                    <span className="badge badge-paused">
-                      <Pause size={12} />
-                      SLA Paused
+                    <span className="sla-pause-pill">
+                      <Pause size={11} /> SLA Paused
                     </span>
                   )}
                 </div>

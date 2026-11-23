@@ -32,6 +32,7 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
   const [customerMode, setCustomerMode] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // 1. Initial Load: Agents and default login
   useEffect(() => {
@@ -172,7 +173,7 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Sleek Dark Left Navbar */}
+      {/* Sleek Dark Left Navbar (Collapsible) */}
       <SidebarNav
         agents={agents}
         currentAgent={currentAgent}
@@ -185,6 +186,8 @@ export default function App() {
         activePriority={activePriority}
         onChangePriority={setActivePriority}
         counts={counts}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
       {/* Crisp White Workspace (Middle List + Right Details) */}

@@ -6,12 +6,14 @@ import {
   AlertTriangle,
   PauseCircle,
   PlusCircle,
-  ShieldCheck,
   Eye,
   EyeOff,
-  User,
+  PanelLeftClose,
+  PanelLeftOpen,
+  ChevronRight,
+  Shield,
   Clock,
-  Activity
+  Sparkles
 } from 'lucide-react';
 
 export default function SidebarNav({
@@ -25,143 +27,184 @@ export default function SidebarNav({
   onChangeFilter,
   activePriority,
   onChangePriority,
-  counts
+  counts,
+  isCollapsed,
+  onToggleCollapse
 }) {
   const filterItems = [
     { id: 'all', label: 'All Tickets', icon: Inbox, count: counts.all },
     { id: 'me', label: 'Assigned to Me', icon: UserCheck, count: counts.me },
     { id: 'unassigned', label: 'Unassigned', icon: HelpCircle, count: counts.unassigned },
-    { id: 'late', label: 'Late / SLA Breached', icon: AlertTriangle, count: counts.late, alert: true },
+    { id: 'late', label: 'Late / Breached', icon: AlertTriangle, count: counts.late, alert: true },
     { id: 'waiting', label: 'Waiting on Customer', icon: PauseCircle, count: counts.waiting }
   ];
 
   const priorities = [
-    { id: 'all', label: 'All Priorities' },
-    { id: 'critical', label: 'Critical (2h / Same Day)' },
-    { id: 'medium', label: 'Medium (4.5h / 3 Days)' },
-    { id: 'low', label: 'Low (1 Day / 1 Week)' }
+    { id: 'all', label: 'All Priorities', short: 'All' },
+    { id: 'critical', label: 'Critical (2h / Same Day)', short: 'Critical' },
+    { id: 'medium', label: 'Medium (4.5h / 3 Days)', short: 'Medium' },
+    { id: 'low', label: 'Low (1 Day / 1 Week)', short: 'Low' }
   ];
 
   const initials = currentAgent?.name
-    ? currentAgent.name.split(' ').map(n => n[0]).join('')
+    ? currentAgent.name.split(' ').map((n) => n[0]).join('')
     : 'A';
 
   return (
-    <aside className="dark-sidebar">
-      {/* Brand Header */}
-      <div className="dark-sidebar-brand">
-        <div className="brand-logo-icon">F</div>
-        <div className="brand-title-wrap">
-          <h1 className="brand-app-name">Frontdesk</h1>
-          <span className="brand-company-name">Arvo Systems</span>
-        </div>
+    <aside className={`dark-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+      {/* Top Header with Brand & Collapse Toggle */}
+      <div className="dark-sidebar-header">
+        {!isCollapsed && (
+          <div className="dark-brand-block">
+            <div className="brand-logo-glow">
+              <span>F</span>
+            </div>
+            <div className="brand-text-block">
+              <div className="brand-main-title">Frontdesk</div>
+              <div className="brand-subtitle">Arvo Systems</div>
+            </div>
+          </div>
+        )}
+
+        {isCollapsed && (
+          <div className="brand-logo-glow compact" title="Frontdesk · Arvo Systems">
+            <span>F</span>
+          </div>
+        )}
+
+        {/* Clickable Navbar Toggle to Collapse/Expand */}
+        <button
+          className="btn-collapse-toggle"
+          onClick={onToggleCollapse}
+          title={isCollapsed ? 'Expand sidebar' : 'Hide sidebar'}
+        >
+          {isCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+        </button>
       </div>
 
       {/* Primary Action Button */}
-      <div className="dark-sidebar-actions">
-        <button className="btn-create-ticket" onClick={onOpenNewTicket}>
-          <PlusCircle size={16} />
-          <span>New Problem Ticket</span>
+      <div className="sidebar-action-wrap">
+        <button
+          className={`btn-new-ticket ${isCollapsed ? 'compact' : ''}`}
+          onClick={onOpenNewTicket}
+          title="Create New Problem Ticket"
+        >
+          <PlusCircle size={17} />
+          {!isCollapsed && <span>New Problem</span>}
         </button>
 
-        {/* Customer Perspective Simulator Toggle (INC-0304) */}
-        <button
-          className={`btn-customer-toggle ${customerMode ? 'active-customer-mode' : ''}`}
-          onClick={onToggleCustomerMode}
-          title="Toggle view as customer to verify private notes never leak"
-        >
-          {customerMode ? <EyeOff size={15} /> : <Eye size={15} />}
-          <span>{customerMode ? 'Customer View Active' : 'Verify Customer View'}</span>
-        </button>
+        {!isCollapsed && (
+          <button
+            className={`btn-verify-customer ${customerMode ? 'active' : ''}`}
+            onClick={onToggleCustomerMode}
+            title="Toggle customer perspective to prove private team notes never leak"
+          >
+            {customerMode ? <EyeOff size={14} /> : <Eye size={14} />}
+            <span>{customerMode ? 'Customer View Active' : 'Verify Customer View'}</span>
+          </button>
+        )}
       </div>
 
-      {/* Agent Profile & Switcher */}
-      <div className="dark-agent-card">
-        <div className="agent-avatar-circle">
+      {/* Agent Identity Card & Switcher */}
+      <div className={`agent-profile-card ${isCollapsed ? 'compact' : ''}`}>
+        <div className="agent-avatar" title={`${currentAgent?.name} (${currentAgent?.role})`}>
           {customerMode ? 'C' : initials}
         </div>
-        <div className="agent-info-wrap">
-          <div className="agent-name-text">
-            {customerMode ? 'Customer Session' : currentAgent?.name || 'Agent'}
+
+        {!isCollapsed && (
+          <div className="agent-text-wrap">
+            <div className="agent-primary-name">
+              {customerMode ? 'Customer Session' : currentAgent?.name || 'Agent'}
+            </div>
+            <div className="agent-secondary-role">
+              {customerMode ? 'External View' : currentAgent?.role || 'Support'}
+            </div>
           </div>
-          <div className="agent-role-text">
-            {customerMode ? 'External Client' : currentAgent?.role || 'Support'}
-          </div>
-        </div>
+        )}
 
         {!customerMode && (
           <select
-            className="dark-agent-select"
+            className="agent-hidden-select"
             value={currentAgent?.id || ''}
             onChange={(e) => onSelectAgent(Number(e.target.value))}
-            title="Switch active Arvo agent"
+            title="Click to switch support agent"
           >
             {agents.map((ag) => (
               <option key={ag.id} value={ag.id}>
-                Switch: {ag.name} ({ag.role})
+                Switch to: {ag.name} ({ag.role})
               </option>
             ))}
           </select>
         )}
       </div>
 
-      {/* Navigation Links / Queue Views */}
-      <div className="dark-nav-section">
-        <div className="dark-section-title">Queue Views</div>
-        <div className="dark-nav-list">
-          {filterItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeFilter === item.id;
-            return (
-              <button
-                key={item.id}
-                className={`dark-nav-item ${isActive ? 'active' : ''}`}
-                onClick={() => onChangeFilter(item.id)}
-              >
-                <div className="nav-item-left">
-                  <Icon
-                    size={16}
-                    className={`nav-icon ${item.alert && item.count > 0 ? 'icon-alert' : ''}`}
-                  />
-                  <span>{item.label}</span>
-                </div>
-                <span
-                  className={`dark-counter-badge ${
-                    item.alert && item.count > 0 ? 'counter-alert' : ''
-                  }`}
-                >
-                  {item.count || 0}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      {/* Navigation Sections */}
+      <div className="sidebar-nav-scroll">
+        <div className="nav-group-section">
+          {!isCollapsed && <div className="nav-group-heading">Queues</div>}
+          <div className="nav-links-column">
+            {filterItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeFilter === item.id;
+              const isAlert = item.alert && item.count > 0;
 
-      {/* SLA Tier / Priority Filters */}
-      <div className="dark-nav-section">
-        <div className="dark-section-title">SLA Priority Filter</div>
-        <div className="dark-nav-list">
-          {priorities.map((p) => (
-            <button
-              key={p.id}
-              className={`dark-nav-item ${activePriority === p.id ? 'active' : ''}`}
-              onClick={() => onChangePriority(p.id)}
-            >
-              <span>{p.label}</span>
-            </button>
-          ))}
+              return (
+                <button
+                  key={item.id}
+                  className={`sidebar-nav-button ${isActive ? 'active' : ''} ${
+                    isCollapsed ? 'compact' : ''
+                  }`}
+                  onClick={() => onChangeFilter(item.id)}
+                  title={`${item.label} (${item.count || 0})`}
+                >
+                  <div className="button-label-left">
+                    <Icon size={17} className={`nav-icon ${isAlert ? 'alert-pulse' : ''}`} />
+                    {!isCollapsed && <span>{item.label}</span>}
+                  </div>
+
+                  {!isCollapsed && (
+                    <span className={`pill-counter ${isAlert ? 'pill-alert' : ''}`}>
+                      {item.count || 0}
+                    </span>
+                  )}
+
+                  {isCollapsed && isAlert && <div className="collapsed-alert-dot" />}
+                </button>
+              );
+            })}
+          </div>
         </div>
+
+        {!isCollapsed && (
+          <div className="nav-group-section" style={{ marginTop: '16px' }}>
+            <div className="nav-group-heading">SLA Priority Filter</div>
+            <div className="nav-links-column">
+              {priorities.map((p) => (
+                <button
+                  key={p.id}
+                  className={`sidebar-nav-button priority-btn ${
+                    activePriority === p.id ? 'active' : ''
+                  }`}
+                  onClick={() => onChangePriority(p.id)}
+                >
+                  <span>{p.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Footer Info */}
-      <div className="dark-sidebar-footer">
-        <div className="sla-hours-status">
-          <div className="status-indicator-dot"></div>
-          <div>
-            <div className="sla-hours-title">SLA Clock: Mon–Fri 09:30–18:30</div>
-            <div className="sla-hours-sub">Weekends & Festivals Excluded</div>
-          </div>
+      <div className={`sidebar-bottom-footer ${isCollapsed ? 'compact' : ''}`}>
+        <div className="sla-live-badge">
+          <div className="live-dot" />
+          {!isCollapsed && (
+            <div className="sla-hours-text">
+              <span className="sla-label">SLA Clock: 09:30–18:30</span>
+              <span className="sla-sub">Mon–Fri · Holidays Off</span>
+            </div>
+          )}
         </div>
       </div>
     </aside>
