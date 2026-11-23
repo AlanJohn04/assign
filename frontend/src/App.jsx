@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import Header from './components/Header';
-import TicketFilters from './components/TicketFilters';
+import SidebarNav from './components/SidebarNav';
 import TicketList from './components/TicketList';
 import TicketDetail from './components/TicketDetail';
 import NewTicketModal from './components/NewTicketModal';
@@ -173,24 +172,23 @@ export default function App() {
 
   return (
     <div className="app-container">
-      <Header
+      {/* Sleek Dark Left Navbar */}
+      <SidebarNav
         agents={agents}
         currentAgent={currentAgent}
         onSelectAgent={handleSelectAgent}
         onOpenNewTicket={() => setIsNewModalOpen(true)}
         customerMode={customerMode}
         onToggleCustomerMode={() => setCustomerMode(!customerMode)}
+        activeFilter={activeFilter}
+        onChangeFilter={setActiveFilter}
+        activePriority={activePriority}
+        onChangePriority={setActivePriority}
+        counts={counts}
       />
 
-      <div className="dashboard-main">
-        <TicketFilters
-          activeFilter={activeFilter}
-          onChangeFilter={setActiveFilter}
-          activePriority={activePriority}
-          onChangePriority={setActivePriority}
-          counts={counts}
-        />
-
+      {/* Crisp White Workspace (Middle List + Right Details) */}
+      <main className="workspace-main">
         <TicketList
           tickets={tickets}
           selectedTicketId={selectedTicketId}
@@ -215,7 +213,7 @@ export default function App() {
             if (selectedTicketId) loadSelectedTicket(selectedTicketId);
           }}
         />
-      </div>
+      </main>
 
       <NewTicketModal
         isOpen={isNewModalOpen}

@@ -159,7 +159,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Missing required ticket fields' });
     }
 
-    const ticketNumber = `TICK-${Math.floor(1000 + Math.random() * 9000)}`;
+    const ticketNumber = `TICK-${Date.now().toString().slice(-6)}-${Math.floor(10 + Math.random() * 90)}`;
     const now = new Date();
     const deadlines = calculateInitialDeadlines(priority, now);
 
