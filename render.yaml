@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: frontdesk-arvo
+    env: node
+    plan: free
+    buildCommand: npm --prefix backend install && npm --prefix frontend install && npm --prefix frontend run build
+    startCommand: node backend/src/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: frontdesk-db
+          property: connectionString
+
+databases:
+  - name: frontdesk-db
+    plan: free
+    databaseName: frontdesk
+    user: arvo
