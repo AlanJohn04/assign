@@ -103,7 +103,15 @@ frontdesk/
 
 ## 4. Running Locally
 
-### Option A: Quick Start (Zero Config — Recommended)
+### Option A: Double-Click Batch File (Windows — Quickest)
+
+Simply double-click:
+- **`run.bat`**: Automatically checks dependencies, builds the frontend if needed, launches the server on port 3000, and opens `http://localhost:3000` in your default browser.
+- **`test.bat`**: Executes all 10 unit and integration tests and displays the verification report.
+
+---
+
+### Option B: Quick Start (Zero Config — Recommended via CLI)
 
 Node.js 20+ is required:
 
