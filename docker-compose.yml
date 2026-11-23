@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: frontdesk_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: arvo
+      POSTGRES_PASSWORD: arvopassword2026
+      POSTGRES_DB: frontdesk_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: frontdesk_app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgresql://arvo:arvopassword2026@db:5432/frontdesk_db
+      JWT_SECRET: arvo-production-secret-frontdesk-2026
+    depends_on:
+      - db
+
+volumes:
+  pgdata:

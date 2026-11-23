@@ -1,0 +1,21 @@
+{
+  "name": "frontdesk",
+  "version": "1.0.0",
+  "description": "Frontdesk — Support Ticket Management System for Arvo Systems",
+  "private": true,
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && node src/server.js",
+    "test": "cd backend && npm test",
+    "seed": "cd backend && npm run seed"
+  },
+  "keywords": [
+    "support-desk",
+    "sla-engine",
+    "frontdesk",
+    "arvo-systems"
+  ],
+  "author": "Arvo Systems Engineering",
+  "license": "ISC"
+}
